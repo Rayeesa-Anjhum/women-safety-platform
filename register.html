@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeGuard | Create Safety Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="glass-panel w-full max-w-lg p-12 shadow-2xl border border-white/10 relative">
+        <div class="text-center mb-10">
+            <h2 class="text-4xl font-black text-white">Setup Profile</h2>
+            <p class="text-slate-400 text-sm mt-3 max-w-sm mx-auto">This data is essential for accurate emergency responder dispatch.</p>
+        </div>
+
+        <form id="profileForm" class="space-y-6">
+            <div class="floating-input">
+                <input type="text" id="name" required placeholder="Abitha">
+                <label for="name">Full Name</label>
+            </div>
+
+            <div class="floating-input">
+                <input type="tel" id="phone" required placeholder="+91 XXXXX XXXXX">
+                <label for="phone">Personal Phone</label>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/60 mt-8">
+                <p class="text-red-500 font-bold text-sm mb-6 pb-2 tracking-wider">PRIMARY EMERGENCY CONTACT</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <input type="text" id="contactName" required placeholder="Contact Name" class="w-full bg-slate-900 border border-slate-800 p-4 rounded-xl outline-none text-white transition focus:border-red-500">
+                    <input type="tel" id="contactPhone" required placeholder="Contact Phone" class="w-full bg-slate-900 border border-slate-800 p-4 rounded-xl outline-none text-white transition focus:border-red-500">
+                </div>
+            </div>
+
+            <button type="submit" id="saveBtn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-5 rounded-2xl transition-all shadow-lg shadow-red-600/20 text-lg flex items-center justify-center gap-3">
+                Save and Complete Setup
+                <div id="btnLoader" class="hidden border-2 border-white border-t-transparent rounded-full w-5 h-5 animate-spin"></div>
+            </button>
+        </form>
+    </div>
+
+    <div id="toast" class="fixed top-10 right-10 glass-panel p-6 bg-green-500/90 text-white transform translate-x-[150%] transition-transform duration-700 flex items-center gap-4 border-2 border-green-300">
+        <span class="text-3xl">✅</span>
+        <div>
+            <p class="font-bold text-lg">Profile Created Successfully!</p>
+            <p class="text-xs opacity-90">Securely stored. Redirecting to SOS Command Center...</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            const loader = document.getElementById('btnLoader');
+            const toast = document.getElementById('toast');
+
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+
+            const userData = {
+                fullName: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                emergencyName: document.getElementById('contactName').value,
+                emergencyPhone: document.getElementById('contactPhone').value
+            };
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    toast.style.transform = 'translateX(0)';
+                    setTimeout(() => { window.location.href = 'index.html'; }, 2200); 
+                }
+            } catch (err) {
+                alert("Network error. Try again.");
+                btn.disabled = false;
+                loader.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
